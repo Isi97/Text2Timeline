@@ -3,6 +3,7 @@ from backend.commons.parser_commons import ParserInput, ParserOutput, ParserSett
 from backend.parsers.base import BaseParser
 from backend.commons.output_exports import CSVExporter
 
+from backend.parsers.spacy import SpacyParser
 import nltk.data
 
 
@@ -14,23 +15,32 @@ tokenized = tokenizer.tokenize(loaded) # type: ignore
 
 
 
-parser: AllennlpParser = AllennlpParser()
+
 settings: ParserSettings = ParserSettings()
 settings.context_radius = 2
 
-parser.settings = settings
 
 
 
+spacy_parser: SpacyParser = SpacyParser()
+spacy_parser.settings = settings
 
-result: ParserOutput = parser.accept(ParserInput(tokenized))
+spacy_result = spacy_parser.accept(ParserInput(loaded))
+
+print("Spacy Done")
+
+# parser: AllennlpParser = AllennlpParser()
+# allen_nlp_result: ParserOutput = parser.accept(ParserInput(tokenized))
+# parser.settings = settings
+
+print("Allen done")
 
 
-
-
-print("Number of events: " + str(len(result)))
 
 exporter: CSVExporter = CSVExporter()
-exporter.export("output", result)
+# exporter.export("output_allenlp", allen_nlp_result)
+exporter.export("output_spacy", spacy_result)
 
-print("Done!")
+print("Exports Done!")
+
+# TODO remove duplicate events from spacy parser
