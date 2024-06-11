@@ -24,7 +24,7 @@ class MPLRenderer(BaseRenderer):
 
     @override
     def render(self):
-        if self._output_type == RendererOutputType.MATPLOTLIB:
+        if self._output_type == RendererOutputType.LIBRARY_NATIVE:
             self._plot.show()
         if self._output_type == RendererOutputType.EXPORT_IMAGE:
             file_path = get_export_file_path(2, "timeline"+str(self._parser_output.current_page)+".png")
@@ -99,7 +99,7 @@ class MPLRenderer(BaseRenderer):
         return self._output_type
 
     @output_type.setter
-    def output_type(self, ot: RendererOutputType = RendererOutputType.MATPLOTLIB):
+    def output_type(self, ot: RendererOutputType = RendererOutputType.LIBRARY_NATIVE):
         self._output_type = ot
 
     def pad_year(self, year):
@@ -217,7 +217,7 @@ class MPLInteractiveRenderer(BaseRenderer):
 
     @override
     def render(self):
-        if self._output_type == RendererOutputType.MATPLOTLIB:
+        if self._output_type == RendererOutputType.LIBRARY_NATIVE:
             self._plot.show()
         if self._output_type == RendererOutputType.EXPORT_IMAGE:
             file_path = get_export_file_path(2, "timeline"+str(self._parser_output.current_page)+".png")
@@ -275,7 +275,7 @@ class MPLInteractiveRenderer(BaseRenderer):
         return self._output_type
 
     @output_type.setter
-    def output_type(self, ot: RendererOutputType = RendererOutputType.MATPLOTLIB):
+    def output_type(self, ot: RendererOutputType = RendererOutputType.LIBRARY_NATIVE):
         self._output_type = ot
 
     def format_text(self, text, limit):
