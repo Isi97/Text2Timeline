@@ -9,6 +9,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.dates as mdates
+import mplcursors
 
 from ..commons.utils import get_export_file_path
 
@@ -24,10 +25,10 @@ class MPLRenderer(BaseRenderer):
     @override
     def render(self):
         if self._output_type == RendererOutputType.MATPLOTLIB:
-            plt.show()
+            self._plot.show()
         if self._output_type == RendererOutputType.EXPORT_IMAGE:
-            file_path = get_export_file_path(2, "timeline.png")
-            plt.savefig(file_path)
+            file_path = get_export_file_path(2, "timeline"+str(self._parser_output.current_page)+".png")
+            self._plot.savefig(file_path)
 
 
     def build_plot(self, temporal_entities: List[TemporalEntity]):
@@ -73,14 +74,17 @@ class MPLRenderer(BaseRenderer):
 
         self._plot = plt
 
-    def render_next_page(self, render_instantly: bool = False):
+    @override
+    def render_next_page(self):
+        plt.clf()
+        plt.close()
         self.build_plot(self._parser_output.next_page())
-        if render_instantly:
-            self.render()
+        self.render()
 
+    @override
     def render_pages(self):
         while self._parser_output.has_next_page():
-            self.render_next_page(render_instantly=True)
+            self.render_next_page()
 
     @property
     def settings(self):
@@ -201,3 +205,87 @@ def zoom_factory(ax, base_scale=2.):
 
     # return the function
     return zoom_fun
+
+
+
+class MPLInteractiveRenderer(BaseRenderer):
+    @override
+    def accept(self, parser_output: ParserOutput):
+        self._parser_output = parser_output
+        self.build_plot(self._parser_output.get_current_page())
+                
+
+    @override
+    def render(self):
+        if self._output_type == RendererOutputType.MATPLOTLIB:
+            self._plot.show()
+        if self._output_type == RendererOutputType.EXPORT_IMAGE:
+            file_path = get_export_file_path(2, "timeline"+str(self._parser_output.current_page)+".png")
+            self._plot.savefig(file_path)
+
+
+    def build_plot(self, temporal_entities: List[TemporalEntity]):
+        entities = sorted(temporal_entities, key=lambda x: int(x.year))
+        years = [int(e.year) for e in entities]
+
+        plt.figure(figsize=(10, 6))
+        line, = plt.plot(range(len(entities)), years, marker="o", linestyle="", color="blue")
+
+        for i, e in enumerate(entities):
+            # Add a small offset to the x-coordinate of the text label
+            #plt.text(e.year + 0.2, i, e.event, va="center")
+            pass
+
+        plt.title("Timeline of Events")
+        #plt.xlabel("Year")
+
+        plt.ylim(min(years), max(years))
+        plt.xticks([])
+        #plt.xlim(-1, len(entities))
+
+        plt.gca().spines["top"].set_visible(False)
+        plt.gca().spines["right"].set_visible(False)
+        plt.gca().spines["left"].set_visible(False)
+
+        mplcursors.cursor(hover=True).connect("add", lambda sel: sel.annotation.set_text(self.format_text(entities[sel.target.index].event, 50)))
+        self._plot = plt
+
+    @override
+    def render_next_page(self):
+        plt.clf()
+        plt.close()
+        self.build_plot(self._parser_output.next_page())
+        self.render()
+
+    @override
+    def render_pages(self):
+        while self._parser_output.has_next_page():
+            self.render_next_page()
+
+    @property
+    def settings(self):
+        return self._settings
+
+    @settings.setter
+    def settings(self, settings: RendererSettings):
+        self._settings = settings
+
+    @property
+    def output_type(self):
+        return self._output_type
+
+    @output_type.setter
+    def output_type(self, ot: RendererOutputType = RendererOutputType.MATPLOTLIB):
+        self._output_type = ot
+
+    def format_text(self, text, limit):
+        s = text.split(" ")
+        result = text.split(" ")
+
+        char_count = 0
+        for i, x in enumerate(s):
+            char_count += len(x)
+            if char_count >= limit:
+                result.insert(i, "\n")
+                char_count = 0
+        return " ".join(result)

@@ -5,7 +5,7 @@ from backend.commons.output_exports import CSVExporter
 
 from backend.parsers.spacy import SpacyParser
 from backend.renderers.base_renderer import RendererOutputType
-from backend.renderers.mpl import MPLRenderer
+from backend.renderers.mpl import MPLInteractiveRenderer, MPLRenderer
 
 
 with open("resources/texts/Germany.txt", 'r') as file:
@@ -36,7 +36,7 @@ print("Spacy Done")
 
 print("Allen done")
 
-mpl_renderer: MPLRenderer = MPLRenderer()
+mpl_renderer = MPLInteractiveRenderer()
 mpl_renderer.accept(spacy_result)
 mpl_renderer.output_type = RendererOutputType.MATPLOTLIB
 mpl_renderer.render_pages()

@@ -43,3 +43,12 @@ class BaseRenderer(ABC):
         self._output_type = ot
 
 
+    @abstractmethod
+    def render_next_page(self):
+        raise NotImplemented
+
+    @abstractmethod
+    def render_pages(self):
+        raise NotImplemented
+
+

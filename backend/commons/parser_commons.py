@@ -100,12 +100,13 @@ class ParserOutput(object):
         return self._content[index:index+self.page_size]
 
     def next_page(self) -> List[TemporalEntity]:
-        self.current_page += 1
-
         if self.current_page * self.page_size >= len(self.content):
             self.current_page = 0
 
-        return self.get_current_page()
+        current_page = self.get_current_page()
+        self.current_page += 1
+
+        return current_page
 
     def has_next_page(self) -> bool:
         if (self.current_page + 1) * self.page_size >= len(self.content):
