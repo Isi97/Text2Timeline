@@ -46,6 +46,9 @@ class ParserOutput(object):
 
     def __init__(self, content: List[TemporalEntity]):
         self._content = content
+        self.page_size = 20
+        self.current_page = 1
+
     @property
     def content(self) -> List[TemporalEntity]:
         return self._content
@@ -89,3 +92,23 @@ class ParserOutput(object):
         self._years = years
 
         return self._years
+
+    # list splicing is inclusive beginning non-inclusive end
+
+    def get_current_page(self) -> List[TemporalEntity]:
+        index = (self.current_page - 1) * self.page_size
+        return self._content[index:index+self.page_size]
+
+    def next_page(self) -> List[TemporalEntity]:
+        self.current_page += 1
+
+        if self.current_page * self.page_size >= len(self.content):
+            self.current_page = 0
+
+        return self.get_current_page()
+
+    def has_next_page(self) -> bool:
+        if (self.current_page + 1) * self.page_size >= len(self.content):
+            return False
+        
+        return True

@@ -4,6 +4,7 @@ import os
 
 from ..commons.temporal import TemporalEntity
 from ..commons.parser_commons import ParserOutput
+from ..commons.utils import get_export_folder_path
 
 from typing import Optional
 
@@ -17,10 +18,7 @@ class CSVExporter():
         field_names = ["Date", "Year", "Event", "Context_Before", "Context_After"]
         file_name += ".csv"
 
-        script_dir = os.path.dirname(__file__)
-        relative_directory = "../../exports"
-
-        parent_output_dir = os.path.normpath(os.path.join(script_dir, relative_directory))
+        parent_output_dir = get_export_folder_path(nesting_level=2)
 
         os.makedirs(parent_output_dir, exist_ok=True)
 

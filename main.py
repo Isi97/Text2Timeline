@@ -4,7 +4,8 @@ from backend.parsers.base import BaseParser
 from backend.commons.output_exports import CSVExporter
 
 from backend.parsers.spacy import SpacyParser
-
+from backend.renderers.base_renderer import RendererOutputType
+from backend.renderers.mpl import MPLRenderer
 
 
 with open("resources/texts/Germany.txt", 'r') as file:
@@ -35,12 +36,16 @@ print("Spacy Done")
 
 print("Allen done")
 
+mpl_renderer: MPLRenderer = MPLRenderer()
+mpl_renderer.accept(spacy_result)
+mpl_renderer.output_type = RendererOutputType.MATPLOTLIB
+mpl_renderer.render_pages()
 
 
-exporter: CSVExporter = CSVExporter()
+
+#exporter: CSVExporter = CSVExporter()
 # exporter.export("output_allenlp", allen_nlp_result)
-exporter.export("output_spacy_v3", spacy_result)
-
+#exporter.export("output_spacy_v3", spacy_result)
 print("Exports Done!")
 
 # TODO remove duplicate events from spacy parser
