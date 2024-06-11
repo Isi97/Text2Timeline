@@ -11,7 +11,7 @@ from ..commons.parser_commons import ParserInput, ParserOutput, ParserSettings
 
 
 class SpacyParser(BaseParser):
-    _SPACY_TEMPORAL_TAG: List[str] = ["DATE", "TIME"]
+    _SPACY_TEMPORAL_TAGS: List[str] = ["DATE", "TIME"]
     _TEMPORAL_ERROR: str = "ERROR GETTING DATE/YEAR"
 
     def __init__(self):
@@ -38,16 +38,19 @@ class SpacyParser(BaseParser):
 
     def extract_temporals(self, spacy_document) -> List[TemporalEntity]:
         tempora_entity_list: List[TemporalEntity] = []
+        processed_events: List[str] = []
 
         for entity in spacy_document.ents:
-            if entity.label_ in self._SPACY_TEMPORAL_TAG:
+            if entity.label_ in self._SPACY_TEMPORAL_TAGS:
                 date = entity.text
                 event = entity.sent.text
 
                 result_year = self.get_year(date)
                 temporal_value = self.format_year(result_year)
 
-                if temporal_value is not None:
+                if temporal_value is not None and event not in processed_events:
+                    processed_events.append(event) # temporary solution to duplicate events due to spacy document structure
+
                     temporal_entity: TemporalEntity = TemporalEntity()
                     temporal_entity.event = event
                     temporal_entity.date = date
@@ -112,7 +115,7 @@ class SpacyParser(BaseParser):
 
     def init_spacy(self):
         nlp = spacy.load("en_core_web_sm")
-        document = nlp(self.input.content) # expects non-tokenized text, move tokenization to Input class
+        document = nlp(self.input.get_content()) # expects non-tokenized text
         self._sentences = list(document.sents)
 
         self._sentence_start_to_index_map: Dict[int, int] = {}

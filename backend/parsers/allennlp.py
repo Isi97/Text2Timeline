@@ -37,7 +37,11 @@ class AllennlpParser(BaseParser):
     @override
     def accept(self, input: ParserInput) -> ParserOutput:
         self.input = input
+        # currently assuming this parsers always receives sentence-tokenized input
+        self.input.tokenize()
+        
         self.init_allennlp()
+        
 
         predictions = self.get_allennlp_predictions()
 
@@ -52,7 +56,7 @@ class AllennlpParser(BaseParser):
     def get_allennlp_predictions(self) -> list:
         predictions = []
 
-        for corpus_index, part in enumerate(self.input.content):
+        for corpus_index, part in enumerate(self.input.get_content()):
             predictions.append(PredictionWrapper(self.predictor.predict(part), corpus_index))  # type: ignore
 
         return predictions
@@ -86,13 +90,13 @@ class AllennlpParser(BaseParser):
         if context_radius == 0:
             return
 
-        corpus_size = len(self.input.content)
+        corpus_size = len(self.input.get_content())
 
         for x in range(1, context_radius+1):
                         if (corpus_index - x) > 0:
-                            temporal_entity.context_before += self.input.content[corpus_index - x] + " "
+                            temporal_entity.context_before += self.input.get_content()[corpus_index - x] + " "
                         if (corpus_index + x) < corpus_size:
-                            temporal_entity.context_after += self.input.content[corpus_index + x] + " "
+                            temporal_entity.context_after += self.input.get_content()[corpus_index + x] + " "
 
     def handle_temporal_found(self, prediction: dict, description: str) -> TemporalEntity:
         temporal_entity = TemporalEntity()
