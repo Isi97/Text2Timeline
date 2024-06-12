@@ -6,7 +6,7 @@ from allennlp_models.pretrained import load_predictor
 from .base import BaseParser
 from typing_extensions import override
 from ..commons.parser_commons import ParserInput, ParserOutput, ParserSettings
-from ..commons.utils import word_list_to_string, disable_logging
+from ..commons.utils import word_list_to_string, disable_logging, log_decorator
 from ..commons.temporal import TemporalEntity
 
 import re
@@ -22,6 +22,7 @@ class PredictionWrapper(object):
 class AllennlpParser(BaseParser):
     ALLENNLP_TEMPORAL_TAG = "ARGM-TMP"
     NO_DATE_DETECTED = "ERROR_NO_DATE"
+    PARSER_NAME = "allen_nlp"
 
     def __init__(self):
         self._settings = ParserSettings() # all default values
@@ -37,25 +38,31 @@ class AllennlpParser(BaseParser):
     @override
     def accept(self, input: ParserInput) -> ParserOutput:
         self.input = input
-        # currently assuming this parsers always receives sentence-tokenized input
+
+        # currently his parsers needs to receive sentence-tokenized input
         self.input.tokenize()
         
+
         self.init_allennlp()
-        
+
 
         predictions = self.get_allennlp_predictions()
 
+
         tempora_entity_list = self.extract_temporal_parts(predictions)
 
-        return ParserOutput(tempora_entity_list)
+        output = ParserOutput(tempora_entity_list)
+        output.parser_name = self.PARSER_NAME
+        return output
 
     @disable_logging
     def init_allennlp(self):
         self.predictor = load_predictor("structured-prediction-srl-bert")
 
+
     def get_allennlp_predictions(self) -> list:
         predictions = []
-
+        print(self.input.get_content())
         for corpus_index, part in enumerate(self.input.get_content()):
             predictions.append(PredictionWrapper(self.predictor.predict(part), corpus_index))  # type: ignore
 

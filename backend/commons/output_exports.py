@@ -15,6 +15,7 @@ class CSVExporter():
         pass
 
     def export(self, file_name:str, parser_output: ParserOutput):
+        
         field_names = ["Date", "Year", "Event", "Context_Before", "Context_After"]
         file_name += ".csv"
 

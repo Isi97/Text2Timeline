@@ -1,4 +1,4 @@
-import spacy
+import stanza
 import re
 
 from typing_extensions import override
@@ -8,14 +8,19 @@ from .base import BaseParser
 from ..commons.temporal import TemporalEntity
 from ..commons.parser_commons import ParserInput, ParserOutput, ParserSettings
 
+from ..commons.t2t_logging import log_info
 
-
-class SpacyParser(BaseParser):
-    _SPACY_TEMPORAL_TAGS: List[str] = ["DATE", "TIME"]
+class StanzaParser(BaseParser):
+    _STANZA_TEMPORAL_TAGS: List[str] = ["DATE", "TIME"]
     _TEMPORAL_ERROR: str = "ERROR GETTING DATE/YEAR"
-    _PARSER_NAME: str = "spaCy"
+    _PARSER_NAME: str = "stanza"
+    _MODEL = None
 
     def __init__(self):
+        if self._MODEL is None:
+            StanzaParser._MODEL = stanza.Pipeline(lang='en',processors='tokenize,ner')
+            log_info("Stanza NER model loaded")
+
         self._settings = ParserSettings() # all default values
 
     @property
@@ -44,7 +49,7 @@ class SpacyParser(BaseParser):
         processed_events: List[str] = []
 
         for entity in spacy_document.ents:
-            if entity.label_ in self._SPACY_TEMPORAL_TAGS:
+            if entity.label_ in self._STANZA_TEMPORAL_TAGS:
                 date = entity.text
                 event = entity.sent.text
 
@@ -66,7 +71,8 @@ class SpacyParser(BaseParser):
         return tempora_entity_list
 
     def populate_context(self, temporal_entity: TemporalEntity, sentence_start):
-        context_radius = self._settings.context_radius
+        pass
+        """ context_radius = self._settings.context_radius
 
         if context_radius == 0:
             return
@@ -77,7 +83,7 @@ class SpacyParser(BaseParser):
                         if (sentence_index - x) > 0:
                             temporal_entity.context_before += str(self._sentences[sentence_index - x]) + " "
                         if (sentence_index + x) < self._sentence_size:
-                            temporal_entity.context_after += str(self._sentences[sentence_index + x]) + " "
+                            temporal_entity.context_after += str(self._sentences[sentence_index + x]) + " " """
 
 
     def format_year(self, year):
@@ -117,7 +123,7 @@ class SpacyParser(BaseParser):
 
 
     def init_spacy(self):
-        nlp = spacy.load("en_core_web_sm")
+        """ nlp = spacy.load("en_core_web_sm")
         document = nlp(self.input.get_content()) # expects non-tokenized text
         self._sentences = list(document.sents)
 
@@ -126,5 +132,5 @@ class SpacyParser(BaseParser):
         for index, sentence in enumerate(self._sentences):
             self._sentence_start_to_index_map[sentence.start] = index # type: ignore
 
-        self._sentence_size = len(list(document.sents))
-        return document
+        self._sentence_size = len(list(document.sents)) """
+        return None

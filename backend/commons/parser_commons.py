@@ -19,14 +19,14 @@ class ParserSettings(object):
 import nltk
 
 class ParserInput():
-    tokenizer = nltk.data.load('nltk:tokenizers/punkt/english.pickle')
+    _tokenizer = nltk.data.load('nltk:tokenizers/punkt/english.pickle')
 
     def __init__(self, content):
         self._content = content
         self._raw = content
 
     def tokenize(self):
-        self._cotent = tokenizer.tokenize(content) # type: ignore
+        self._content = self._tokenizer.tokenize(self._content) # type: ignore
 
     def remove_citations(self):
         pass
@@ -48,6 +48,10 @@ class ParserOutput(object):
         self._content = content
         self.page_size = 20
         self.current_page = 1
+        self.parser_name = ""
+        self.elapsed_time: float
+
+        self.sort_asc()
 
     @property
     def content(self) -> List[TemporalEntity]:
@@ -58,7 +62,7 @@ class ParserOutput(object):
         self._content = content
 
     def __len__(self):
-        return len(self.content)
+        return len(self._content)
 
     def __str__(self):
         result: str = ""
@@ -113,3 +117,6 @@ class ParserOutput(object):
             return False
         
         return True
+
+    def sort_asc(self):
+        self._content = sorted(self._content, key=lambda x: int(x.year))

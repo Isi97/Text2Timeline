@@ -41,3 +41,14 @@ def get_export_file_path(nesting_level:int = 2, file_name: str = "NO_FILE_NAME_S
     folder_path = get_export_folder_path(nesting_level)
     file_path = os.path.join(folder_path, file_name)
     return file_path
+
+
+
+
+
+def log_decorator(callback):
+    def decorated(*args, **kwargs):
+        logging.getLogger().info(callback.__name__ + " " + "starting")
+        callback(*args, **kwargs)
+        logging.getLogger().info(callback.__name__ + " " + "finished")
+    return decorated
