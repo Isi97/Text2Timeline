@@ -8,6 +8,8 @@ from .base import BaseParser
 from ..commons.temporal import TemporalEntity
 from ..commons.parser_commons import ParserInput, ParserOutput, ParserSettings
 
+from ..commons.t2t_logging import log_info
+
 
 
 class SpacyParser(BaseParser):
@@ -37,6 +39,7 @@ class SpacyParser(BaseParser):
 
         output: ParserOutput = ParserOutput(tempora_entity_list)
         output.parser_name = self._PARSER_NAME
+        log_info("Spacy done!")
         return output
 
     def extract_temporals(self, spacy_document) -> List[TemporalEntity]:
