@@ -17,5 +17,6 @@ poetry run python -m spacy download en_core_web_sm
 
 and manually set scipy to version 1.12 if another dependency sets it to something else
 
-## Issues
+## Issues/Todo
 
+Make models in parsers not re-load for each instance
