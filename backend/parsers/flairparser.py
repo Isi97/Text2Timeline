@@ -9,8 +9,6 @@ from .base import BaseParser
 from ..commons.temporal import TemporalEntity
 from ..commons.parser_commons import ParserInput, ParserOutput, ParserSettings
 
-from ..commons.t2t_logging import log_info
-
 import re
 
 class PredictionWrapper(object):
@@ -39,7 +37,11 @@ class FlairParser(BaseParser):
         self.input = input
         wrapped_prediction_list: List[PredictionWrapper] = []
 
-        self.init_flair()
+        # keep inits barebones to potentially run in separate threads
+        # move init out of here later, call it separately
+        self.initialize()
+        self.init_document()
+
         wrapped_prediction_list = self.extract_temporals(self._sentences)
 
         temporal_entity_list: List[TemporalEntity] = []
@@ -47,7 +49,6 @@ class FlairParser(BaseParser):
 
         output: ParserOutput = ParserOutput(temporal_entity_list)
         output.parser_name = self._PARSER_NAME
-        log_info("Flair done!")
         return output
 
     def extract_temporals(self, spacy_document) -> List[PredictionWrapper]:
@@ -133,9 +134,11 @@ class FlairParser(BaseParser):
         return result_year
     
 
-
-    def init_flair(self):
+    @override
+    def initialize(self):
         self._model = SequenceTagger.load("ner-ontonotes")
+
+    def init_document(self):
         # Might as well use the flair tokenizer instead of the nltk one
         tokenized = [Sentence(sent, use_tokenizer=True) for sent in split_single(self.input.get_content())]
         self._model.predict(tokenized)

@@ -33,8 +33,9 @@ class SpacyParser(BaseParser):
         self.input = input
         tempora_entity_list: List[TemporalEntity] = []
 
-
-        spacy_document = self.init_spacy()
+        self.initialize()
+        spacy_document = self.init_document()
+        
         tempora_entity_list = self.extract_temporals(spacy_document)
 
         output: ParserOutput = ParserOutput(tempora_entity_list)
@@ -118,10 +119,13 @@ class SpacyParser(BaseParser):
         return result_year
     
 
+    @override
+    def initialize(self):
+        self._nlp = spacy.load("en_core_web_sm")
+        
 
-    def init_spacy(self):
-        nlp = spacy.load("en_core_web_sm")
-        document = nlp(self.input.get_content()) # expects non-tokenized text
+    def init_document(self):
+        document = self._nlp(self.input.get_content()) # expects non-tokenized text
         self._sentences = list(document.sents)
 
         self._sentence_start_to_index_map: Dict[int, int] = {}

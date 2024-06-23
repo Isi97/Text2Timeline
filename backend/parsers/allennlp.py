@@ -22,7 +22,7 @@ class PredictionWrapper(object):
 class AllennlpParser(BaseParser):
     ALLENNLP_TEMPORAL_TAG = "ARGM-TMP"
     NO_DATE_DETECTED = "ERROR_NO_DATE"
-    PARSER_NAME = "allen_nlp"
+    _PARSER_NAME = "allen_nlp"
 
     def __init__(self):
         self._settings = ParserSettings() # all default values
@@ -39,11 +39,11 @@ class AllennlpParser(BaseParser):
     def accept(self, input: ParserInput) -> ParserOutput:
         self.input = input
 
-        # currently his parsers needs to receive sentence-tokenized input
+        # currently this parsers needs to receive sentence-tokenized input
         self.input.tokenize()
         
 
-        self.init_allennlp()
+        self.initialize()
 
 
         predictions = self.get_allennlp_predictions()
@@ -52,11 +52,12 @@ class AllennlpParser(BaseParser):
         tempora_entity_list = self.extract_temporal_parts(predictions)
 
         output = ParserOutput(tempora_entity_list)
-        output.parser_name = self.PARSER_NAME
+        output.parser_name = self._PARSER_NAME
         return output
 
     @disable_logging
-    def init_allennlp(self):
+    @override
+    def initialize(self):
         self.predictor = load_predictor("structured-prediction-srl-bert")
 
 

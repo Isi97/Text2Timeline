@@ -9,6 +9,10 @@ class BaseParser(ABC):
     def accept(self, input: ParserInput) -> ParserOutput:
         raise NotImplemented
 
+    @abstractmethod
+    def initialize(self) -> None:
+        raise NotImplemented
+
     @property
     @abstractmethod
     def settings(self):

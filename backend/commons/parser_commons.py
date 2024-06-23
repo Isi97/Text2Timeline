@@ -4,7 +4,7 @@ from ..commons.temporal import TemporalEntity
 import re
 
 class ParserSettings(object):
-    def __init__(self, context_radius: int = 0):
+    def __init__(self, context_radius: int = 0, name: str = "NAME_NOT_SET"):
         self._context_radius = context_radius
 
     @property
@@ -66,7 +66,7 @@ class ParserOutput(object):
 
     def __str__(self):
         result: str = ""
-
+        result += f"{self.parser_name}\n---------------------\n";
         for temporal_entity in self.content:
             result += str(temporal_entity) + "\n"
 
