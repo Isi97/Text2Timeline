@@ -16,6 +16,7 @@ mplcursors = "^0.5.3"
 flair = "^0.13.1"
 scipy = "1.12"
 flask = "^3.0.3"
+flask-wtf = "^1.2.1"
 
 
 [build-system]

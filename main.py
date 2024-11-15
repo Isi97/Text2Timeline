@@ -12,10 +12,6 @@ from backend.parsers.flairparser import FlairParser
 
 from backend.commons.t2t_logging import initialize_logging, log_info
 
-import logging
-import os
-import subprocess
-import json
 import time
 
 
@@ -46,11 +42,12 @@ log_info(f"{parser_result.parser_name} took: {parser_result.elapsed_time}")
 
 
 
-#mpl_renderer = PlotlyRenderer()
-#mpl_renderer.accept(parser_result)
-#mpl_renderer.output_type = RendererOutputType.LIBRARY_NATIVE
-#mpl_renderer.render_next_page()
+mpl_renderer = PlotlyRenderer()
+mpl_renderer.accept(parser_result)
+mpl_renderer.output_type = RendererOutputType.LIBRARY_NATIVE
+mpl_renderer.render()
 
+print("HLELO")
 
 
 """ 
